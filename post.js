@@ -1,6 +1,12 @@
 const core = require('@actions/core');
+const execa = require('execa');
 
-var pid = core.getState("pidOfPortFowardedProcess");
+const command = `kill $(ps aux | grep port-forward | grep 8080 | awk '{print $2}')`;
+core.debug(`cmd: ${command}`);
 
-core.info(`Killing the portforwarded process with id ${pid}`)
-process.kill(pid);
+execa.command(command, {
+    detached: false,
+    stdio: 'ignore',
+});
+
+core.info(`Killed the portforwarded process`)

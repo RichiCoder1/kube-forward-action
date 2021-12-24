@@ -28,7 +28,7 @@ const core = require("@actions/core");
 
     const [kind, name] = targetRef.split('/');
     const getCmd = `kubectl get ${kind} --namespace=${namespace} -o json`;
-    core.info(`cmd: ${getCmd}`);
+    core.debug(`cmd: ${getCmd}`);
     const { stdout: output, stderr: error } = await execa.command(getCmd);
 
     if (error) {
@@ -46,7 +46,7 @@ const core = require("@actions/core");
     }
 
     const command = `kubectl port-forward --namespace=${namespace} ${targetRef} ${port}:${targetPort}`;
-    core.info(`cmd: ${command}`);
+    core.debug(`cmd: ${command}`);
     const kubectl = execa.command(command, {
         detached: true,
         stdio: 'ignore',
@@ -62,9 +62,10 @@ const core = require("@actions/core");
             if (response.status < 200 || response.stats >= 400) {
                 throw new Error(`Failed to connect: ${response.statusText}`)
             }
+            core.info('Successfully port-forwarded!!')
         }, {
             retries: 3,
-            onFailedAttempt: retry => core.info(JSON.stringify(retry))
+            onFailedAttempt: retry => core.debug(JSON.stringify(retry))
         });
     } catch (e) {
         core.error('Failed to start port-forward.');
@@ -78,8 +79,6 @@ const core = require("@actions/core");
     }
     kubectl.unref();
     await kubectl;
-
-    core.saveState("pidOfPortFowardedProcess", kubectl.pid);
 
     core.setOutput('port', port);
     core.setOutput('pid', kubectl.pid);

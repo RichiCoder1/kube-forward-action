@@ -4144,7 +4144,7 @@ const action_core = __webpack_require__(470);
 
     const [kind, name] = targetRef.split('/');
     const getCmd = `kubectl get ${kind} --namespace=${namespace} -o json`;
-    action_core.info(`cmd: ${getCmd}`);
+    action_core.debug(`cmd: ${getCmd}`);
     const { stdout: output, stderr: error } = await action_execa.command(getCmd);
 
     if (error) {
@@ -4162,7 +4162,7 @@ const action_core = __webpack_require__(470);
     }
 
     const command = `kubectl port-forward --namespace=${namespace} ${targetRef} ${port}:${targetPort}`;
-    action_core.info(`cmd: ${command}`);
+    action_core.debug(`cmd: ${command}`);
     const kubectl = action_execa.command(command, {
         detached: true,
         stdio: 'ignore',
@@ -4178,9 +4178,10 @@ const action_core = __webpack_require__(470);
             if (response.status < 200 || response.stats >= 400) {
                 throw new Error(`Failed to connect: ${response.statusText}`)
             }
+            action_core.info('Successfully port-forwarded!!')
         }, {
             retries: 3,
-            onFailedAttempt: retry => action_core.info(JSON.stringify(retry))
+            onFailedAttempt: retry => action_core.debug(JSON.stringify(retry))
         });
     } catch (e) {
         action_core.error('Failed to start port-forward.');
@@ -4194,8 +4195,6 @@ const action_core = __webpack_require__(470);
     }
     kubectl.unref();
     await kubectl;
-
-    action_core.saveState("pidOfPortFowardedProcess", kubectl.pid);
 
     action_core.setOutput('port', port);
     action_core.setOutput('pid', kubectl.pid);
