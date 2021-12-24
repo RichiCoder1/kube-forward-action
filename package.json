@@ -4,7 +4,7 @@
   "description": "A helper action to open a port-forward to a kube-cluster",
   "main": "action.js",
   "scripts": {
-    "build": "ncc build action.js -o dist/action"
+    "build": "ncc build action.js -o dist/action && ncc build post.js -o dist/post"
   },
   "repository": {
     "type": "git",

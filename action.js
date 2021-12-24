@@ -79,6 +79,8 @@ const core = require("@actions/core");
     kubectl.unref();
     await kubectl;
 
+    core.saveState("pidOfPortFowardedProcess", kubectl.pid);
+
     core.setOutput('port', port);
     core.setOutput('pid', kubectl.pid);
     core.setOutput('kubeconfig', kubeconfig);

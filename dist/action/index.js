@@ -4195,6 +4195,8 @@ const action_core = __webpack_require__(470);
     kubectl.unref();
     await kubectl;
 
+    action_core.saveState("pidOfPortFowardedProcess", kubectl.pid);
+
     action_core.setOutput('port', port);
     action_core.setOutput('pid', kubectl.pid);
     action_core.setOutput('kubeconfig', kubeconfig);
