@@ -237,7 +237,13 @@ module.exports._enoent = enoent;
 const core = __webpack_require__(470);
 const execa = __webpack_require__(955);
 
-const command = `kill $(ps aux | grep port-forward | grep 8080 | awk '{print $2}')`;
+const targetRef = core.getInput('targetRef', { required: true });
+const namespace = core.getInput('namespace', { required: false }) || 'default';
+const port = core.getInput('port', { required: true });
+
+const portForwardCommand = `kubectl port-forward --namespace=${namespace} ${targetRef} ${port}`;
+
+const command = `kill $(ps aux | grep ${portForwardCommand} | awk '{print $2}')`;
 core.debug(`cmd: ${command}`);
 
 execa.command(command, {

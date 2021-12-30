@@ -1,7 +1,13 @@
 const core = require('@actions/core');
 const execa = require('execa');
 
-const command = `kill $(ps aux | grep port-forward | grep 8080 | awk '{print $2}')`;
+const targetRef = core.getInput('targetRef', { required: true });
+const namespace = core.getInput('namespace', { required: false }) || 'default';
+const port = core.getInput('port', { required: true });
+
+const portForwardCommand = `kubectl port-forward --namespace=${namespace} ${targetRef} ${port}`;
+
+const command = `kill $(ps aux | grep ${portForwardCommand} | awk '{print $2}')`;
 core.debug(`cmd: ${command}`);
 
 execa.command(command, {
